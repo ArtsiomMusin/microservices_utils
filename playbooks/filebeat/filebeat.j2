@@ -1,0 +1,12 @@
+filebeat:
+  inputs:
+    - type: docker
+      containers.ids:
+        - {{ads_container_id}}
+        - {{auth_container_id}}
+setup:
+  kibana:
+    host: "http://kibana:5601"
+
+output.logstash:
+  hosts: ["logstash:5044"]

@@ -1,0 +1,17 @@
+[db]
+fragrant-brook-vs.icdc.io
+
+[rabbitmq]
+empty-frost-vs.icdc.io
+
+[nginx]
+icy-darkness-vs.icdc.io
+
+[app]
+misty-sun-vs.icdc.io
+
+
+[all:vars]
+
+ansible_user=admin
+ansible_python_interpreter=/usr/bin/python3

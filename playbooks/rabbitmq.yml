@@ -1,0 +1,63 @@
+---
+- hosts: rabbitmq
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: ensure trusted key added
+      apt_key:
+        url: 'https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc'
+        state: present
+
+    - name: ensure rabbitmq repos added
+      apt_repository:
+        repo: '{{item}}'
+        state: present
+      with_items:
+        - 'deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang-22.x'
+        - 'deb https://dl.bintray.com/rabbitmq-erlang/debian bionic main'
+
+    - name: ensure rabbitmq installed
+      apt:
+        name: rabbitmq-server
+
+    - name: ensure rabbitmq plugins installed
+      rabbitmq_plugin:
+        names: rabbitmq_management
+        state: enabled
+      notify:
+        - restart rabbitmq
+    
+    - name: open 5672 port
+      ufw:
+        rule: allow
+        port: 5672
+
+  handlers:
+    - name: restart rabbitmq
+      service:
+        name: rabbitmq-server
+        state: restarted
+
+- hosts: rabbitmq
+  become: yes
+  gather_facts: no
+  vars:
+    user: ads
+    password: password
+  tasks:
+    - name: ensure rabbitmq user present
+      rabbitmq_user:
+        user: '{{user}}'
+        password: '{{password}}'
+        tags: administrator
+        vhost: /
+        configure_priv: .*
+        write_priv: .*
+        read_priv: .*
+        state: present
+    - name: ensure guest user absent
+      rabbitmq_user:
+        user: guest
+        state: absent
+    

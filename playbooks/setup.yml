@@ -1,0 +1,28 @@
+---
+- hosts: app
+  gather_facts: no
+  become: yes
+  vars:
+    env_vars: |
+      RABBITMQ_HOST=empty-frost-vs.icdc.io
+      RABBITMQ_USER=ads
+      RABBITMQ_PASS=password
+      RACK_ENV=production
+      DB_USERNAME=ads
+      DB_PASSWORD=password
+      DB_HOST=fragrant-brook-vs.icdc.io
+
+  tasks:
+    - name: ensure pip installed
+      apt:
+        name: python3-pip
+      
+    - name: ensure python deps installed
+      pip:
+        name: docker
+
+    - name: copy env file
+      copy: 
+        content: '{{env_vars}}'
+        dest: '/home/{{ansible_user}}/.env'
+
